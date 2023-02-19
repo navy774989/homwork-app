@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Stack, VStack } from "@chakra-ui/react";
+import TagsList from "./components/TagsList";
+import SearchInput from "./components/SearchInput";
+
+import QuestionsList from "./components/QuestionsList";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <VStack w={"100%"} paddingX={4} justify={"center"} align={"center"}>
+        <VStack w={{ sm: "100%", md: "75%", lg: "65%", xl: "55%" }}>
+          <VStack bgColor={"white"} position={"sticky"} top={0} w={"full"}>
+            <SearchInput />
+            <TagsList />
+          </VStack>
+
+          <QuestionsList />
+        </VStack>
+      </VStack>
     </div>
   );
 }
