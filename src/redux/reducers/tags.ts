@@ -1,9 +1,4 @@
-import {
-  createAction,
-  createAsyncThunk,
-  createSlice,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getTags } from "../apis/getTags";
 import { TagItemProps } from "../apis/types/TagProps";
 

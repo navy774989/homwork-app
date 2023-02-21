@@ -21,68 +21,59 @@ import { QuestionProps } from "../redux/apis/types/QuestionsProps";
 import { fetchQuestions } from "../redux/reducers/questions";
 import { AppDispatch } from "../redux/store";
 import { useMediaQuery } from "@chakra-ui/react";
+import InfiniteScroll from "react-infinite-scroll-component";
 const QuestionsList = () => {
-  const currentPage = React.useRef(0);
+  const currentPage = React.useRef(1);
   const dispatch = useDispatch<AppDispatch>();
   const selectedTag = useAppSelector(
     (state) => state.tags.selectedTag,
     shallowEqual
   );
+  const query = useAppSelector((state) => state.search.query, shallowEqual);
   const loading = useAppSelector((state) => state.tags.loading, shallowEqual);
-  const isfetchQuestionLoading = useAppSelector(
-    (state) => state.questions.loading,
-    shallowEqual
-  );
   const { questions } = useAppSelector(
     (state) => state.questions,
     shallowEqual
   );
+  const questionsLoading = useAppSelector((state) => state.questions.loading);
   React.useEffect(() => {
     if (loading === "succeeded") {
+      currentPage.current = 1;
       dispatch(
-        fetchQuestions({ tags: selectedTag?.name, page: currentPage.current })
+        fetchQuestions({
+          tags: selectedTag?.name,
+          page: currentPage.current,
+          q: query,
+        })
       );
     }
-  }, [selectedTag, loading]);
-  const loader = React.useRef(null);
-
-  const handleObserver = React.useCallback(
-    (entries: any[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        if (!isfetchQuestionLoading) {
-          currentPage.current = currentPage.current + 1;
-          dispatch(
-            fetchQuestions({
-              tags: selectedTag?.name,
-              page: currentPage.current,
-            })
-          );
-        }
-        // setPage((prev) => prev + 1);
-      }
-    },
-    [isfetchQuestionLoading]
-  );
-
-  React.useEffect(() => {
-    const option = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 0,
-    };
-    const observer = new IntersectionObserver(handleObserver, option);
-    if (loader.current) observer.observe(loader.current);
-  }, [handleObserver]);
-
+  }, [selectedTag, loading, query]);
+  const onNext = () => {
+    currentPage.current = currentPage.current + 1;
+    if (loading != "pending") {
+      dispatch(
+        fetchQuestions({
+          tags: selectedTag?.name,
+          page: currentPage.current,
+          q: query,
+        })
+      );
+    }
+  };
   return (
     <VStack w={"full"}>
-      {questions.map((item) => {
-        return <QuestionItem key={item.link} data={item} />;
-      })}
-      <div ref={loader} />
-      {isfetchQuestionLoading == "pending" && <LoadingUI />}
-      <Stack w={"full"} h={"20vh"} />
+      <InfiniteScroll
+        className=""
+        dataLength={questions.length}
+        next={onNext}
+        hasMore={true}
+        loader={null}
+      >
+        {questions.map((item) => {
+          return <QuestionItem key={item.link} data={item} />;
+        })}
+      </InfiniteScroll>
+      {questionsLoading === "pending" && <LoadingUI />}
     </VStack>
   );
 };
@@ -127,6 +118,7 @@ const QuestionItem = ({ data }: { data: QuestionProps }) => {
       borderColor={"gray.200"}
       padding={3}
       rounded={6}
+      mb={3}
     >
       <HStack w={"full"}>
         <Image w={5} h={5} rounded={"full"} src={data?.owner?.profile_image} />

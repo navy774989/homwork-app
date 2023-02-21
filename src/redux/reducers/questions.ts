@@ -4,8 +4,8 @@ import { QuestionProps } from "../apis/types/QuestionsProps";
 
 export const fetchQuestions = createAsyncThunk(
   "FETCH_QUESTIONS",
-  async ({ q, tags }: { q?: string; tags?: string; page?: number }) => {
-    const response = await getQuestions({ q: q, tags: tags });
+  async ({ q, tags, page }: { q?: string; tags?: string; page?: number }) => {
+    const response = await getQuestions({ q: q, tags: tags, page });
     return response.data;
   }
 );
@@ -30,15 +30,18 @@ const questions = createSlice({
     // Add reducers for additional action types here, and handle loading state as needed
     builder.addCase(fetchQuestions.fulfilled, (state, action) => {
       // Add user to the state array
+      if (action?.meta?.arg?.page && action?.meta?.arg?.page > 1) {
+        state.questions = state.questions.concat(action.payload.items);
+      } else {
+        state.questions = action.payload.items;
+      }
 
-      state.questions = action.payload.items;
       state.loading = "succeeded";
     });
     builder.addCase(fetchQuestions.pending, (state, action) => {
-      if (action.meta.arg.page === 0) {
+      if (action.meta.arg.page === 1) {
         state.questions = [];
       }
-
       state.loading = "pending";
     });
   },

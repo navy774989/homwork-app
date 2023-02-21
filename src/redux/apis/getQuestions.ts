@@ -18,7 +18,8 @@ export const getQuestions = ({
       sort: "activity",
       site: "stackoverflow",
       tagged: tags,
-      page: page ?? 0,
+      page: page ?? 1,
+      key: "Wdfc9cBtdTIgfost7oOE0A((",
     },
   });
 };
