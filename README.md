@@ -18,4 +18,4 @@ serve -s build`
 
 ## Demo Website
 
-https://vercel.com/alex774989/homwork-app
+https://homwork-app.vercel.app/
